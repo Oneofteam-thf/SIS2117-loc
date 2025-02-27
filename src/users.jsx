@@ -383,10 +383,7 @@ export const Users = () => {
                 <Table.Td>
                   {q.iin}
                 </Table.Td>
-                <Table.Td>
-                  {(q?.status === 'active' || q?.status === '') && <span className='text-green-500'>Активен</span>}
-                  {q?.status === 'lost' && <span className='text-red-500'>Потерян</span>}
-                </Table.Td>
+
                 <Table.Td>
                   {(q?.devices?.length !== 0 && q?.devices) ?  q?.devices?.map((w, index) => {
                     return (
@@ -400,6 +397,10 @@ export const Users = () => {
                       </div>
                     )
                   }) : 'Нет данных'}
+                </Table.Td>
+                <Table.Td>
+                  {(q?.status === 'active' || q?.status === '') && <span className='text-green-500'>Активен</span>}
+                  {q?.status === 'lost' && <span className='text-red-500'>Потерян</span>}
                 </Table.Td>
                 <Table.Td>
                   <Menu>
