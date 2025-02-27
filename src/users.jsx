@@ -353,6 +353,9 @@ export const Users = () => {
                 Устройство
               </Table.Th>
               <Table.Th>
+                Статус
+              </Table.Th>
+              <Table.Th>
                 Действие
               </Table.Th>
             </Table.Tr>
@@ -379,6 +382,10 @@ export const Users = () => {
                 </Table.Td>
                 <Table.Td>
                   {q.iin}
+                </Table.Td>
+                <Table.Td>
+                  {(q?.status === 'active' || q?.status === '') && <span className='text-green-500'>Активен</span>}
+                  {q?.status === 'lost' && <span className='text-red-500'>Потерян</span>}
                 </Table.Td>
                 <Table.Td>
                   {(q?.devices?.length !== 0 && q?.devices) ?  q?.devices?.map((w, index) => {
