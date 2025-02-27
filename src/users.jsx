@@ -444,7 +444,7 @@ export const Users = () => {
           <CopyButton value={password}>
             {({ copied, copy }) => (
               <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-                {copied ? 'Скопировано' : 'Скоировать'}
+                {copied ? 'Скопировано' : 'Скопировать'}
               </Button>
             )}
           </CopyButton>
