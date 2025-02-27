@@ -1,1 +1,1 @@
-export { app, db } from './firebase'
+export { pb } from './pocketbase'

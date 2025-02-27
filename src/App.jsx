@@ -1,41 +1,102 @@
 import React from "react";
-import Map, { Marker } from 'react-map-gl/mapbox';
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "shared/api";
 
-import "mapbox-gl/dist/mapbox-gl.css";
+import { pb } from "shared/api";
+import { Avatar, Button, LoadingOverlay, Menu, Table } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+
+import { Users } from "users";
+import { useAuth } from "useAuth";
+import { useNavigate } from "react-router-dom";
+import Map, { Marker } from 'react-map-gl/mapbox';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 async function getUsersLocation () {
-  const querySnapshot = await getDocs(collection(db, "location"));
-  querySnapshot.forEach((doc) => {
-    console.log(`${doc.id} => ${doc.data()}`);
-  });
+  return await pb.collection('locations').getFullList({
+    expand: "user"
+  })
 }
 
-function App() {
+export const App = () => {
 
-  const [users, setUsers] = React.useState([]);
+  const {user, logout, loading} = useAuth()
+
+  const navigate = useNavigate()
+
+  const [locations, setLocations] = React.useState([]);
+
+  if (loading) {
+    <LoadingOverlay visible={loading} />
+  }
 
   React.useEffect(() => {
-    getUsersLocation()
-  }, [])
+    if (!loading) {
+      if (user?.id) {
+        getUsersLocation()
+        .then((locations) => {
+          setLocations(locations);
+        })
+      }
+      else navigate('/login')
+    }
+  }, [loading])
+
+  React.useEffect(() => {
+    pb.collection('locations').subscribe('*', async ({}) => {
+      getUsersLocation()
+      .then((locations) => {
+        setLocations(locations);
+      })
+    })
+  }, [user])
 
   return (
     <>
-      <Map
-        mapboxAccessToken={import.meta.env.VITE_APP_MAPBOX_TOKEN}
-        initialViewState={{ latitude: 43.222, longitude: 76.851, zoom: 12 }}
-        style={{ width: "100vw", height: "100vh" }}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
-      >
-        {/* {users.map((user, index) => ( */}
-          <Marker scale={1} key={1} longitude={76.9251837} latitude={43.2302925} color="red">
-            
-          </Marker>
-        {/* // ))} */}
-      </Map>
+      <div className="fixed z-50 flex justify-between w-full p-3">
+        <Button
+          onClick={() => navigate('/users')}
+          variant="light"
+        >
+          Пользователи
+        </Button>
+        <Button
+          variant="light"
+          onClick={() => {
+            logout()
+            window.location.reload()
+          }}
+        >
+          Выйти
+        </Button>
+      </div>
+        <Map
+          mapboxAccessToken={import.meta.env.VITE_APP_MAPBOX_TOKEN}
+          initialViewState={{
+            longitude: 76.9252157,
+            latitude: 43.2302982,
+            zoom: 13
+          }}
+          style={{ width: "100vw", height: "100vh", zIndex: 10, }}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+        >
+          {locations?.map((q, index) => {
+            return (
+              <Marker scale={5} key={index} longitude={q?.data?.longitude ?? 90} latitude={q?.data?.latitude ?? 90} >
+                <div className="flex flex-col items-center">
+                  <Avatar
+                    src={pb.files.getURL(q?.expand?.user, q.expand?.user?.avatar)}
+                    alt={q.expand?.user?.name}
+                    radius="xl"
+                    color="blue"
+                  />
+                  <span className="font-bold">
+                    {q.expand?.user?.name ?? 'Неизвестный'}
+                  </span>
+                </div>
+              </Marker>
+            )}
+          )}
+        </Map>
     </>
   );
 }
-
-export default App;
