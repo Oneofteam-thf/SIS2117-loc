@@ -383,7 +383,6 @@ export const Users = () => {
                 <Table.Td>
                   {q.iin}
                 </Table.Td>
-
                 <Table.Td>
                   {(q?.devices?.length !== 0 && q?.devices) ?  q?.devices?.map((w, index) => {
                     return (
