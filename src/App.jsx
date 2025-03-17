@@ -1,10 +1,8 @@
 import React from "react";
 
 import { pb } from "shared/api";
-import { Avatar, Button, LoadingOverlay, Menu, Table } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Avatar, Button, LoadingOverlay } from "@mantine/core";
 
-import { Users } from "users";
 import { useAuth } from "useAuth";
 import { useNavigate } from "react-router-dom";
 import Map, { Marker } from 'react-map-gl/mapbox';
@@ -42,7 +40,7 @@ export const App = () => {
   }, [loading])
 
   React.useEffect(() => {
-    pb.collection('locations').subscribe('*', async ({}) => {
+    pb.collection('locations').subscribe('*', async () => {
       getUsersLocation()
       .then((locations) => {
         setLocations(locations);
@@ -80,8 +78,9 @@ export const App = () => {
           mapStyle="mapbox://styles/mapbox/streets-v11"
         >
           {locations?.map((q, index) => {
+            console.log(q, 'q')
             return (
-              <Marker scale={5} key={index} longitude={q?.data?.longitude ?? 90} latitude={q?.data?.latitude ?? 90} >
+              <Marker scale={5} key={index} longitude={q?.current?.longitude ?? 90} latitude={q?.current?.latitude ?? 90} >
                 <div className="flex flex-col items-center">
                   <Avatar
                     src={pb.files.getURL(q?.expand?.user, q.expand?.user?.avatar)}

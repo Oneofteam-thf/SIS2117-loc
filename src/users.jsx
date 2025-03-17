@@ -36,21 +36,27 @@ export const Users = () => {
   async function sendNotification () {
     sendLoading_h.open()
     try {
-      return await pb.collection('notifications').update(receiver?.id, {
-        status: 'sent',
-        message 
-      })
-      .then(() => {
-        showNotification({
-          title: 'Уведомление',
-          message: 'Уведомление успешно отправлено',
-          color: 'green'
+      await pb.collection('notifications').getOne(receiver?.id)
+      .then(async res => {        
+        await pb.collection('notifications').update(receiver?.id, {
+          data: [...res?.data ?? [], {
+            date: new Date(),
+            status: 'sent',
+            message,
+          }]
         })
-        setMessage('')
-      })
-      .finally(() => {
-        sendLoading_h.close()
-        notificationModal_h.close()
+        .then(() => {
+          showNotification({
+            title: 'Уведомление',
+            message: 'Уведомление успешно отправлено',
+            color: 'green'
+          })
+          setMessage('')
+        })
+        .finally(() => {
+          sendLoading_h.close()
+          notificationModal_h.close()
+        })
       })
     } catch (err) {
       sendLoading_h.close()
@@ -119,7 +125,7 @@ export const Users = () => {
         id: res?.id,
         user: res.id,
       })
-      .then(res => {
+      .then(() => {
         setPassword(password)
         passwordModal_h.open()
       })
@@ -139,7 +145,7 @@ export const Users = () => {
 
     loading_h.close()
   }
-
+ 
   async function editUser () {
 
     if (!editData.name || !editData.phone || !editData.email || !editData.iin) {
@@ -356,6 +362,9 @@ export const Users = () => {
                 Статус
               </Table.Th>
               <Table.Th>
+                В сети
+              </Table.Th>
+              <Table.Th>
                 Действие
               </Table.Th>
             </Table.Tr>
@@ -400,6 +409,9 @@ export const Users = () => {
                 <Table.Td>
                   {(q?.status === 'active' || q?.status === '') && <span className='text-green-500'>Активен</span>}
                   {q?.status === 'lost' && <span className='text-red-500'>Потерян</span>}
+                </Table.Td>
+                <Table.Td>
+                  {q?.online ? <span className='text-green-500'>В сети</span> : <span className='text-red-500'>Не в сети</span>}
                 </Table.Td>
                 <Table.Td>
                   <Menu>
@@ -468,7 +480,6 @@ export const Users = () => {
         }}
         title='Отправка уведомления'
       >
-        <p></p>
         <Textarea
           autosize
           value={message}

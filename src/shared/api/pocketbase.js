@@ -1,9 +1,8 @@
-import Pocketbase from 'pocketbase'
+import PocketBase from 'pocketbase'
 
-// const pb = new Pocketbase('http://127.0.0.1:8090')
-const pb = new Pocketbase(import.meta.env.VITE_APP_DB_URL);
+const pb = new PocketBase("https://sys.fly.dev");
 
-pb.autoCancellation(false)
+pb.autoCancellation(false);
 
 export {
   pb
